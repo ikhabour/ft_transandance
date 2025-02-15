@@ -164,7 +164,7 @@ function Playermovements(Terrain)
     Terrain.paddlemesh1.position.z += speed;
   }
   if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 10 > Terrain.wallmesh.position.z){
-    Terrain.paddlemesh.position.z -= speed;
+    Terrain.paddlemesh.position.z -= speed; 
   }
   if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 10 < Terrain.wallmesh1.position.z) {
     Terrain.paddlemesh.position.z += speed;
@@ -172,100 +172,6 @@ function Playermovements(Terrain)
 }
 
 let ingame = true;
-
-
-// Add velocity to the ball
-let ballVelocity = new THREE.Vector3(0.7, 0, 0.7); // x, y, z speed
-
-function checkCollision(ball, paddle, ballRadius, paddleHeight, paddleWidth)
-{
-  const ballLeft = ball.position.x - ballRadius;
-  const ballRight = ball.position.x + ballRadius;
-  const ballTop = ball.position.z + ballRadius;
-  const ballBottom = ball.position.z - ballRadius
-  
-  
-  const paddleLeft = paddle.position.x - paddleWidth / 2;
-  const paddleRight = paddle.position.x + paddleWidth / 2;
-  const paddleTop = paddle.position.z + paddleHeight / 2;
-  const paddleBottom = paddle.position.z - paddleHeight / 2;
-
-  return (
-    ballRight > paddleLeft &&
-    ballLeft < paddleRight &&
-    ballTop > paddleBottom &&
-    ballBottom < paddleTop
-  );
-}
-
-function reflectBall(ball, paddle, paddleHeight)
-{
-  console.log("Ball position (Z):", ball.position.z);
-  console.log("Paddle position (Z):", paddle.position.z);
-  console.log("Paddle height:", paddleHeight);
-
-  // Calculate the relative intersection point on the paddle (-0.5 to 0.5)
-  let intersectZ = (ball.position.z - paddle.position.z) / (paddleHeight / 2);
-  intersectZ = Math.max(-0.5, Math.min(0.5, intersectZ));
-  console.log("Intersection point (Z):", intersectZ);
-
-
-    // Set the new direction based on the intersection point
-    const maxAngle = Math.PI / 5; // Maximum reflection angle (60 degrees)
-    const angle = intersectZ * maxAngle;
-
-    // Update ball velocity
-    ballVelocity.x = -ballVelocity.x; // Reverse X direction
-    ballVelocity.z = Math.sin(angle); // Set Z direction based on angle 
-}
-
-function resetBall(ball, Terrain)
-{
-    let random = Math.random();
-    let randomAngleX = (Math.random() * 0.4) + 0.3;
-    let randomAngleZ = (Math.random() * 0.4) + 0.3;
-      ball.position.set(0, 1.3, 0);
-      if (random < 0.25)
-      {
-        ballVelocity.x = randomAngleX;
-        ballVelocity.z = randomAngleZ;
-      }
-      else if (random > 0.25 && random < 0.5)
-      {
-        ballVelocity.x = randomAngleX * -1;
-        ballVelocity.z = randomAngleZ * -1;
-      }
-      else if (random > 0.5 && random < 0.75)
-      {
-        ballVelocity.x = randomAngleX * -1;
-        ballVelocity.z = randomAngleZ;
-      }
-      else
-      {
-        ballVelocity.x = randomAngleX;
-        ballVelocity.z = randomAngleZ * -1;
-      }
-}
-
-
-
-
-function updateBall(ball, paddles, Terrain) {
-
-  ball.position.add(ballVelocity);
-
-  paddles.forEach(paddle => {
-      if (checkCollision(ball, paddle, 1.45, 2.5, 15, Terrain))
-          reflectBall(ball, paddle, 2.5);
-    });
-      if (ball.position.z >= 35 || ball.position.z <= -35) {
-        ballVelocity.z = -ballVelocity.z; // Reverse Z direction
-    }
-
-      if (ball.position.x >= 51.5 || ball.position.x <= -51.5)
-          resetBall(ball, Terrain);
-}
-
 
 
 const scene = new THREE.Scene();
