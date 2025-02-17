@@ -8,7 +8,7 @@ class BuildTerrain{
 
       // Plane
 
-      this.planegeo = new THREE.PlaneGeometry(200, 150, 250);
+      this.planegeo = new THREE.PlaneGeometry(20, 15, 25);
       this.planematerial = new THREE.MeshStandardMaterial({
         color: 0x5b5b5b,
         roughness: 3,
@@ -17,13 +17,13 @@ class BuildTerrain{
       });
       this.plane = new THREE.Mesh(this.planegeo, this.planematerial);
       this.plane.rotateX(-(Math.PI / 2));
-      this.plane.position.set(0, -2, 0);
+      this.plane.position.set(0, -0.2, 0);
       this.plane.receiveShadow = true;
       // this.plane.castShadow = true;
 
       // Walls
 
-      this.wallgeo = new THREE.BoxGeometry(125, 4, 4, 32, 32, 32);
+      this.wallgeo = new THREE.BoxGeometry(14, 0.4, 0.4, 32, 32, 32);
       this.wallmaterial = new THREE.MeshStandardMaterial({
         color: 0x8f8d8d,
         roughness: 0.3,
@@ -35,13 +35,13 @@ class BuildTerrain{
       this.backwall1 = new THREE.Mesh(this.wallgeo, this.wallmaterial);
 
 
-      this.wallmesh.position.set(0, 0, -40);
-      this.wallmesh1.position.set(0, 0, 40);
+      this.wallmesh.position.set(0, 0, -4);
+      this.wallmesh1.position.set(0, 0, 4);
 
       // Back walls
 
-      this.backwall.position.set(-54.5, 0, 0);
-      this.backwall1.position.set(54.5, 0, 0);
+      this.backwall.position.set(-5.45, 0, 0);
+      this.backwall1.position.set(5.45, 0, 0);
       this.backwall.rotateY(Math.PI / 2);
       this.backwall1.rotateY(Math.PI / 2);
 
@@ -49,9 +49,11 @@ class BuildTerrain{
 
       // Paddles
 
-      this.paddlegeo = new THREE.BoxGeometry(15, 2.5, 2.5, 32, 32, 32);
+      this.paddlegeo = new THREE.BoxGeometry(1.5, 0.25, 0.25, 32, 32, 32);
       this.paddlematerial = new THREE.MeshStandardMaterial({
-        color: 0x7145e2,
+        color: 0x00cf2b,
+        emissive: 0x00cf2b,
+        emissiveIntensity: 0.9,
         roughness: 0.3
       });
 
@@ -61,8 +63,8 @@ class BuildTerrain{
       this.paddlemesh.rotateY(Math.PI / 2);
       this.paddlemesh1.rotateY(Math.PI / 2);
 
-      this.paddlemesh.position.set(-50, 1.3, 0);
-      this.paddlemesh1.position.set(50, 1.3, 0);
+      this.paddlemesh.position.set(-6.35, 0.13, 0);
+      this.paddlemesh1.position.set(6.35, 0.13, 0);
 
 
       this.paddlemesh.castShadow = true;
@@ -73,10 +75,10 @@ class BuildTerrain{
 
       // Ball
 
-      this.ballgeo = new THREE.SphereGeometry(1.45, 64, 64);
+      this.ballgeo = new THREE.SphereGeometry(0.075, 64, 64);
       this.ballmaterial = new THREE.MeshStandardMaterial({
-        color: 0x229EED,
-        emissive: 0x229EED,
+        color: 0xFFFFFF,
+        emissive: 0xFFFFFF,
         emissiveIntensity: 3,
         roughness: 0.2,
         metalness: 0.1
@@ -85,7 +87,7 @@ class BuildTerrain{
       // this.ball_light = new THREE.PointLight(0x229EED, 1, 5);
       this.ballmesh = new THREE.Mesh(this.ballgeo, this.ballmaterial);
 
-      this.ballmesh.position.set(0, 1.3, 0);
+      this.ballmesh.position.set(0, 0.13, 0);
       // this.ball_light.position.set(0, 0.13, 0);
 
       // this.ballwithlight = new THREE.Group();
@@ -95,16 +97,16 @@ class BuildTerrain{
 
       // Decorations
 
-      this.mlinegeo = new THREE.BoxGeometry(79, 0.5, 0.5);
+      this.mlinegeo = new THREE.BoxGeometry(7.9, 0.05, 0.05);
       this.mlinematerial = new THREE.MeshStandardMaterial({
-        color: 0xff0085,
-        emissive: 0xff0085,
-        emissiveIntensity: 1,
+        color: 0x00cf2b,
+        emissive: 0x00cf2b,
+        emissiveIntensity: 0.8  ,
         roughness: 0.5
       });
 
       this.mlinemesh = new THREE.Mesh(this.mlinegeo, this.mlinematerial);
-      this.mlinemesh.position.set(0, -2, 0);
+      this.mlinemesh.position.set(0, -0.2, 0);
       this.mlinemesh.rotateY(Math.PI / 2);
 
 
@@ -153,26 +155,91 @@ window.addEventListener('keyup', (event) => {
   keyState[event.code] = false;
 });
 
-const speed = 0.75;
+const speed = 0.075;
 
 function Playermovements(Terrain)
 {
-  if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 10 > Terrain.wallmesh.position.z) {
+  if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1 > Terrain.wallmesh.position.z) {
     Terrain.paddlemesh1.position.z -= speed;
   }
-  if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 10 < Terrain.wallmesh1.position.z) {
+  if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1 < Terrain.wallmesh1.position.z) {
     Terrain.paddlemesh1.position.z += speed;
   }
-  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 10 > Terrain.wallmesh.position.z){
+  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 1  > Terrain.wallmesh.position.z){
     Terrain.paddlemesh.position.z -= speed; 
   }
-  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 10 < Terrain.wallmesh1.position.z) {
+  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 1 < Terrain.wallmesh1.position.z) {
     Terrain.paddlemesh.position.z += speed;
   }
 }
 
-let ingame = true;
 
+let ingame = true;
+const ballSpeed = 0.07;
+let ballVelocity = new THREE.Vector3(ballSpeed, 0, ballSpeed);
+
+function updateBall(ball, paddles, Terrain) {
+    // Update ball position
+    ball.position.add(ballVelocity);
+
+    // Wall collisions (top and bottom walls)
+    if (ball.position.z <= Terrain.wallmesh.position.z + 0.35 || 
+        ball.position.z >= Terrain.wallmesh1.position.z - 0.35) {
+        ballVelocity.z *= -1; // Reverse Z direction
+    }
+
+    // Check for scoring (ball passes paddle)
+    if (ball.position.x <= -6.65 || ball.position.x >= 6.65) {
+        // Reset ball position
+        ball.position.set(0, 0.13, 0);
+        ballVelocity = new THREE.Vector3(ballSpeed * (Math.random() > 0.5 ? 1 : -1), 0, ballSpeed * (Math.random() > 0.5 ? 1 : -1));
+    }
+
+    // Paddle collision detection
+    paddles.forEach(paddle => {
+        // Calculate the bounds of the paddle
+        const paddleLeft = paddle.position.x - 0.125; // Half of paddle depth
+        const paddleRight = paddle.position.x + 0.125;
+        const paddleTop = paddle.position.z - 0.75; // Half of paddle height
+        const paddleBottom = paddle.position.z + 0.75;
+
+        // Check if ball is within paddle bounds
+        if (ball.position.x >= paddleLeft && 
+            ball.position.x <= paddleRight && 
+            ball.position.z >= paddleTop && 
+            ball.position.z <= paddleBottom) {
+            
+            // Calculate where on the paddle the ball hit
+            const hitPosition = (ball.position.z - paddle.position.z) / 0.75; // Normalized hit position (-1 to 1)
+            
+            // Reverse X direction
+            ballVelocity.x *= -1;
+            
+            // Apply different angles based on where the ball hits the paddle
+            if (hitPosition < -0.33) {
+                // Top third of paddle - bounce upward
+                ballVelocity.z = -Math.abs(ballVelocity.z) * 1.2;
+            } else if (hitPosition > 0.33) {
+                // Bottom third of paddle - bounce downward
+                ballVelocity.z = Math.abs(ballVelocity.z) * 1.2;
+            } else {
+                // Middle third of paddle - straight bounce
+                ballVelocity.z *= 0.5; // Reduce vertical movement
+            }
+
+            // Ensure the ball doesn't get stuck in the paddle
+            if (paddle.position.x < 0) {
+                ball.position.x = paddleRight + 0.1;
+            } else {
+                ball.position.x = paddleLeft - 0.1;
+            }
+            
+            // Slightly increase ball speed with each hit
+            const currentSpeed = ballVelocity.length(); 
+            ballVelocity.normalize().multiplyScalar(Math.min(currentSpeed * 1.2, 0.2));
+        }
+    });
+}
 
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({
@@ -186,7 +253,7 @@ renderer.shadowMap.enabled = true;
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
 const controls = new OrbitControls(camera, renderer.domElement);
 
-camera.position.set(-45.5, 77.5, 102.1);
+camera.position.set(-4.55, 7.75, 10.21);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
@@ -221,22 +288,16 @@ scene.add(light);
 scene.add(light1);
 
 
-function animate()
-{
+function animate() {
   if (!ingame) return;
   requestAnimationFrame(animate);
 
-  // renderer.render(scene, camera);
   composer.render();
 
   // Paddle Movements
-
   Playermovements(Terrain);
 
   updateBall(Terrain.ballmesh, [Terrain.paddlemesh1, Terrain.paddlemesh], Terrain);
-  // console.log(Terrain.ballmesh.position.x);
-
 }
-
 
 animate();
