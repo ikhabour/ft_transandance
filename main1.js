@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { EffectComposer, OrbitControls, RenderPass, UnrealBloomPass } from 'three/examples/jsm/Addons.js';
+import { EffectComposer, FontLoader, OrbitControls, RenderPass, TextGeometry, UnrealBloomPass } from 'three/examples/jsm/Addons.js';
 import { emissive, metalness, roughness } from 'three/tsl';
 
 class BuildTerrain{
@@ -49,7 +49,7 @@ class BuildTerrain{
 
       // Paddles
 
-      this.paddlegeo = new THREE.BoxGeometry(1.5, 0.25, 0.25, 32, 32, 32);
+      this.paddlegeo = new THREE.CapsuleGeometry(0.12, 1.25, 32, 32);
       this.paddlematerial = new THREE.MeshStandardMaterial({
         color: 0x00cf2b,
         emissive: 0x00cf2b,
@@ -60,8 +60,8 @@ class BuildTerrain{
       this.paddlemesh = new THREE.Mesh(this.paddlegeo, this.paddlematerial);
       this.paddlemesh1 = new THREE.Mesh(this.paddlegeo, this.paddlematerial);
 
-      this.paddlemesh.rotateY(Math.PI / 2);
-      this.paddlemesh1.rotateY(Math.PI / 2);
+      this.paddlemesh.rotateX(Math.PI / 2);
+      this.paddlemesh1.rotateX(Math.PI / 2);
 
       this.paddlemesh.position.set(-6.35, 0.13, 0);
       this.paddlemesh1.position.set(6.35, 0.13, 0);
@@ -88,12 +88,6 @@ class BuildTerrain{
       this.ballmesh = new THREE.Mesh(this.ballgeo, this.ballmaterial);
 
       this.ballmesh.position.set(0, 0.13, 0);
-      // this.ball_light.position.set(0, 0.13, 0);
-
-      // this.ballwithlight = new THREE.Group();
-
-      // this.ballwithlight.add(this.ballmesh);
-      // this.ballwithlight.add(this.ball_light);
 
       // Decorations
 
@@ -108,6 +102,11 @@ class BuildTerrain{
       this.mlinemesh = new THREE.Mesh(this.mlinegeo, this.mlinematerial);
       this.mlinemesh.position.set(0, -0.2, 0);
       this.mlinemesh.rotateY(Math.PI / 2);
+
+
+      // Score count
+
+
 
 
 
@@ -173,12 +172,103 @@ function Playermovements(Terrain)
   }
 }
 
+let p1Score = 0;
+let p2Score = 0;
+let p1ScoreMesh;
+let p2ScoreMesh;
+
+function createScore(Scene)
+{
+  const fontLoader = new FontLoader();
+  fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+    // Create text geometry configuration
+    const textOptions = {
+        font: font,
+        size: 1.5,
+        depth: 0.2,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 0.05,
+        bevelSize: 0.02,
+        bevelOffset: 0,
+        bevelSegments: 5
+    };
+
+  const textMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0x00ff00,
+    metalness: 0.3,
+    roughness: 0.4,
+    emissive: 0x00ff00,
+    emissiveIntensity: 0.5
+  });
+
+  const scoreGeometry = new TextGeometry('0', textOptions);
+
+  p1ScoreMesh = new THREE.Mesh(scoreGeometry, textMaterial);
+  p2ScoreMesh = new THREE.Mesh(scoreGeometry, textMaterial);
+
+  p1ScoreMesh.position.set(4, 1, -5);
+  p2ScoreMesh.position.set(-6, 1, -5);
+  Scene.add(p1ScoreMesh);
+  Scene.add(p2ScoreMesh);
+  });
+}
+
+function updateScore(Scene, player)
+{
+
+  if (player === 1)
+    p1Score++;
+  else
+    p2Score--;
+  if (p1ScoreMesh && p2ScoreMesh)
+  {
+    Scene.remove(p1ScoreMesh);
+    Scene.remove(p2ScoreMesh);
+
+    const fontLoader = new FontLoader();
+    fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+      // Create text geometry configuration
+        const textOptions = {
+            font: font,
+            size: 1.5,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.02,
+            bevelOffset: 0,
+            bevelSegments: 5
+        };
+
+      const textMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x00ff00,
+        metalness: 0.3,
+        roughness: 0.4,
+        emissive: 0x00ff00,
+        emissiveIntensity: 0.5
+      });
+
+      const p1Geometry = new TextGeometry(p1Score, textOptions);
+      const p2Geometry = new TextGeometry(p2Score, textOptions);
+
+      p1ScoreMesh = new THREE.Mesh(p1Geometry, textMaterial);
+      p2ScoreMesh = new THREE.Mesh(p2Geometry, textMaterial);
+
+      p1ScoreMesh.position.set(4, 1, -5);
+      p2ScoreMesh.position.set(-6, 1, -5);
+      Scene.add(p1ScoreMesh);
+      Scene.add(p2ScoreMesh);
+    });
+  }
+}
+
 
 let ingame = true;
 const ballSpeed = 0.07;
 let ballVelocity = new THREE.Vector3(ballSpeed, 0, ballSpeed);
 
-function updateBall(ball, paddles, Terrain) {
+function updateBall(ball, paddles, Terrain, Scene) {
     // Update ball position
     ball.position.add(ballVelocity);
 
@@ -191,6 +281,12 @@ function updateBall(ball, paddles, Terrain) {
     // Check for scoring (ball passes paddle)
     if (ball.position.x <= -6.65 || ball.position.x >= 6.65) {
         // Reset ball position
+        // console.log("===================================================== Scored ==============================");
+        // console.log("ball position x : ", ball.position.x);
+        if (ball.position.x < 0)
+          updateScore(Scene, 1);
+        else
+          updateScore(Scene, 2);
         ball.position.set(0, 0.13, 0);
         ballVelocity = new THREE.Vector3(ballSpeed * (Math.random() > 0.5 ? 1 : -1), 0, ballSpeed * (Math.random() > 0.5 ? 1 : -1));
     }
@@ -218,10 +314,10 @@ function updateBall(ball, paddles, Terrain) {
             // Apply different angles based on where the ball hits the paddle
             if (hitPosition < -0.33) {
                 // Top third of paddle - bounce upward
-                ballVelocity.z = -Math.abs(ballVelocity.z) * 1.2;
+                ballVelocity.z = -Math.abs(ballVelocity.z) * 1.5;
             } else if (hitPosition > 0.33) {
                 // Bottom third of paddle - bounce downward
-                ballVelocity.z = Math.abs(ballVelocity.z) * 1.2;
+                ballVelocity.z = Math.abs(ballVelocity.z) * 1.5;
             } else {
                 // Middle third of paddle - straight bounce
                 ballVelocity.z *= 0.5; // Reduce vertical movement
@@ -257,7 +353,7 @@ camera.position.set(-4.55, 7.75, 10.21);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
-const light1 = new THREE.AmbientLight(0xffffff, 1.5);
+// const light1 = new THREE.AmbientLight(0xffffff, 1.5);
 
 const light = new THREE.DirectionalLight(0xffffff, 1.5);
 const lightHelper = new THREE.DirectionalLightHelper(light, 2, 0xfffffff);
@@ -285,7 +381,7 @@ composer.addPass(BloomPass);
 
 
 scene.add(light);
-scene.add(light1);
+// scene.add(light1);
 
 
 function animate() {
@@ -294,10 +390,15 @@ function animate() {
 
   composer.render();
 
+  createScore(scene);
   // Paddle Movements
+
   Playermovements(Terrain);
 
-  updateBall(Terrain.ballmesh, [Terrain.paddlemesh1, Terrain.paddlemesh], Terrain);
+  // Ball Movements
+
+  updateBall(Terrain.ballmesh, [Terrain.paddlemesh1, Terrain.paddlemesh], Terrain, scene);
+  // console.log("Ball Z Position : ", Terrain.ballmesh.position.z);
 }
 
 animate();
