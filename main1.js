@@ -177,12 +177,14 @@ let p2Score = 0;
 let p1ScoreMesh;
 let p2ScoreMesh;
 
+let textOptions;
+
 function createScore(Scene)
 {
   const fontLoader = new FontLoader();
   fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
     // Create text geometry configuration
-    const textOptions = {
+      textOptions = {
         font: font,
         size: 1.5,
         depth: 0.2,
@@ -194,12 +196,13 @@ function createScore(Scene)
         bevelSegments: 5
     };
 
+
   const textMaterial = new THREE.MeshStandardMaterial({ 
     color: 0x00ff00,
     metalness: 0.3,
     roughness: 0.4,
-    emissive: 0x00ff00,
-    emissiveIntensity: 0.5
+    // emissive: 0x00ff00,
+    // emissiveIntensity: 0.5
   });
 
   const scoreGeometry = new TextGeometry('0', textOptions);
@@ -211,6 +214,7 @@ function createScore(Scene)
   p2ScoreMesh.position.set(-6, 1, -5);
   Scene.add(p1ScoreMesh);
   Scene.add(p2ScoreMesh);
+
   });
 }
 
@@ -220,37 +224,23 @@ function updateScore(Scene, player)
   if (player === 1)
     p1Score++;
   else
-    p2Score--;
+    p2Score++;
   if (p1ScoreMesh && p2ScoreMesh)
   {
     Scene.remove(p1ScoreMesh);
     Scene.remove(p2ScoreMesh);
 
-    const fontLoader = new FontLoader();
-    fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
-      // Create text geometry configuration
-        const textOptions = {
-            font: font,
-            size: 1.5,
-            depth: 0.2,
-            curveSegments: 12,
-            bevelEnabled: true,
-            bevelThickness: 0.05,
-            bevelSize: 0.02,
-            bevelOffset: 0,
-            bevelSegments: 5
-        };
 
       const textMaterial = new THREE.MeshStandardMaterial({ 
         color: 0x00ff00,
-        metalness: 0.3,
-        roughness: 0.4,
-        emissive: 0x00ff00,
-        emissiveIntensity: 0.5
+        // metalness: 0.3,
+        // roughness: 0.4,
+        // emissive: 0x00ff00,
+        // emissiveIntensity: 0.5
       });
 
-      const p1Geometry = new TextGeometry(p1Score, textOptions);
-      const p2Geometry = new TextGeometry(p2Score, textOptions);
+      const p1Geometry = new TextGeometry(p1Score.toString(), textOptions);
+      const p2Geometry = new TextGeometry(p2Score.toString(), textOptions);
 
       p1ScoreMesh = new THREE.Mesh(p1Geometry, textMaterial);
       p2ScoreMesh = new THREE.Mesh(p2Geometry, textMaterial);
@@ -259,8 +249,10 @@ function updateScore(Scene, player)
       p2ScoreMesh.position.set(-6, 1, -5);
       Scene.add(p1ScoreMesh);
       Scene.add(p2ScoreMesh);
-    });
-  }
+      console.log("Test");
+
+
+    };
 }
 
 
@@ -353,7 +345,7 @@ camera.position.set(-4.55, 7.75, 10.21);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
-// const light1 = new THREE.AmbientLight(0xffffff, 1.5);
+const light1 = new THREE.AmbientLight(0xffffff, 1.5);
 
 const light = new THREE.DirectionalLight(0xffffff, 1.5);
 const lightHelper = new THREE.DirectionalLightHelper(light, 2, 0xfffffff);
@@ -366,6 +358,7 @@ light.castShadow = true;
 
 
 const Terrain = new BuildTerrain(scene);
+createScore(scene);
 
 
 // Composer Effects
@@ -381,7 +374,7 @@ composer.addPass(BloomPass);
 
 
 scene.add(light);
-// scene.add(light1);
+scene.add(light1);
 
 
 function animate() {
@@ -390,7 +383,6 @@ function animate() {
 
   composer.render();
 
-  createScore(scene);
   // Paddle Movements
 
   Playermovements(Terrain);
