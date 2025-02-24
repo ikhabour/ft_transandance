@@ -1,11 +1,10 @@
 import * as THREE from 'three';
 import { EffectComposer, FontLoader, GLTFLoader, OrbitControls, RenderPass, TextGeometry, UnrealBloomPass } from 'three/examples/jsm/Addons.js';
-import { emissive, log, metalness, roughness } from 'three/tsl';
+import { emissive, metalness, roughness } from 'three/tsl';
 
 class BuildTerrain{
     constructor(Scene)
     {
-
 
       // Plane
 
@@ -95,78 +94,14 @@ class BuildTerrain{
       this.mlinemesh.position.set(0, -0.2, 0);
       this.mlinemesh.rotateY(Math.PI / 2);
 
-        // Loaders
-
-        this.loader = new GLTFLoader();
-
-        this.loader.load(
-                'models/Game Play.gltf',
-                 (gltf) => {
-                    // Model loaded successfully
-                    const model = gltf.scene;
-                    
-                    const ballmodel = model.getObjectByName('Ball');
-                    const paddle1model = model.getObjectByName('Player');
-                    const paddle2model = model.getObjectByName('PlayerTwo');
-                    
-                    paddle1model.position.copy(this.paddlemesh.position);
-                    paddle1model.rotateY(Math.PI / 2);
-                    paddle1model.rotateX((Math.PI / 2)* 2);
-                    paddle1model.scale.set(0.3, 0.3, 0.3);
-                    paddle2model.position.copy(this.paddlemesh1.position);
-                    paddle2model.rotateY(Math.PI / 2);
-                    paddle2model.rotateX((Math.PI / 2)* 2);
-                    paddle2model.scale.set(0.3, 0.3, 0.3);
-                    // console.log(ballmodel);
-                    // console.log(paddle1model);
-                    // console.log(this.paddlemesh);
-                    
-                    ballmodel.scale.set(0.0033, 0.0033, 0.0033);
-
-                    
-
-                    // Replace the existing ball mesh
-                    this.paddlemesh.parent.remove(this.paddlemesh);
-                    this.paddlemesh = paddle1model;
-
-                    this.paddlemesh1.parent.remove(this.paddlemesh1);
-                    this.paddlemesh1 = paddle2model;
-
-                    
-
-
-                    this.ballmesh.parent.remove(this.ballmesh);
-                    this.ballmesh = ballmodel;
-
-                    Scene.add(this.ballmesh);
-                    Scene.add(this.paddlemesh);
-                    Scene.add(this.paddlemesh1);
-
-                },
-                function (xhr) {
-                    // Loading progress
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
-                function (error) {
-                    // Error occurred
-                    console.error('An error occurred loading the model:', error);
-                }
-            );
-
 
       // Adding Objects to the Scene
-
-      this.paddlemesh.visible = false;
-      this.paddlemesh1.visible = false;
-      this.ballmesh.visible = false;
-
 
       Scene.add(this.plane);
       Scene.add(this.wallmesh);
       Scene.add(this.wallmesh1);
       Scene.add(this.paddlemesh);
       Scene.add(this.paddlemesh1);
-      
       Scene.add(this.ballmesh);
       Scene.add(this.mlinemesh);
 
@@ -203,9 +138,7 @@ const speed = 0.09;
 
 function Playermovements(Terrain)
 {
-
   if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1 > Terrain.wallmesh.position.z) {
-    console.log("moving");
     Terrain.paddlemesh1.position.z -= speed;
   }
   if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1 < Terrain.wallmesh1.position.z) {
@@ -313,8 +246,8 @@ function updateBall(ball, paddles, Terrain, Scene) {
     ball.position.add(ballVelocity);
 
     // Wall collisions
-    if (ball.position.z <= Terrain.wallmesh.position.z + 0.5 || 
-        ball.position.z >= Terrain.wallmesh1.position.z - 0.5) {
+    if (ball.position.z <= Terrain.wallmesh.position.z + 0.35 || 
+        ball.position.z >= Terrain.wallmesh1.position.z - 0.35) {
         ballVelocity.z *= -1; // Reverse Z direction
     }
 
@@ -337,9 +270,6 @@ function updateBall(ball, paddles, Terrain, Scene) {
         const paddleTop = paddle.position.z - 0.75; // Half of paddle height
         const paddleBottom = paddle.position.z + 0.75;
 
-        ball.rotation.x += ballVelocity.x;
-        ball.rotation.y += ballVelocity.z;
-
         // Check if ball is within paddle bounds
         if (ball.position.x >= paddleLeft && 
             ball.position.x <= paddleRight && 
@@ -351,7 +281,6 @@ function updateBall(ball, paddles, Terrain, Scene) {
             
             // Reverse X direction
             ballVelocity.x *= -1;
-
             
             // Apply different angles based on where the ball hits the paddle
             if (hitPosition < -0.33) {
@@ -396,7 +325,7 @@ camera.position.set(0, 10, 10);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
-const light1 = new THREE.AmbientLight(0xffffff, 2);
+const light1 = new THREE.AmbientLight(0xffffff, 1);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
 const lightHelper = new THREE.DirectionalLightHelper(light, 2, 0xfffffff);
@@ -409,6 +338,7 @@ light.castShadow = true;
 
 const Terrain = new BuildTerrain(scene);
 createScore(scene);
+
 
 // Composer Effects
 
@@ -424,7 +354,6 @@ composer.addPass(BloomPass);
 
 scene.add(light);
 scene.add(light1);
-
 
 
 function animate() {
