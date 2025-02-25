@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { EffectComposer, FontLoader, GLTFLoader, OrbitControls, RenderPass, TextGeometry, UnrealBloomPass } from 'three/examples/jsm/Addons.js';
-import { emissive, log, metalness, roughness } from 'three/tsl';
+import { div, emissive, log, metalness, roughness } from 'three/tsl';
 
 class BuildTerrain{
     constructor(Scene)
@@ -58,8 +58,8 @@ class BuildTerrain{
       this.paddlemesh.rotateX(Math.PI / 2);
       this.paddlemesh1.rotateX(Math.PI / 2);
 
-      this.paddlemesh.position.set(-6.35, 0.13, 0);
-      this.paddlemesh1.position.set(6.35, 0.13, 0);
+      this.paddlemesh.position.set(-6.35, 0, 0);
+      this.paddlemesh1.position.set(6.35, 0, 0);
 
 
       this.paddlemesh.castShadow = true;
@@ -82,7 +82,7 @@ class BuildTerrain{
       // this.ball_light = new THREE.PointLight(0x229EED, 1, 5);
       this.ballmesh = new THREE.Mesh(this.ballgeo, this.ballmaterial);
 
-      this.ballmesh.position.set(0, 0.13, 0);
+      this.ballmesh.position.set(0, 0, 0);
 
         // Loaders
 
@@ -108,7 +108,7 @@ class BuildTerrain{
                     // paddle2model.rotateX((Math.PI / 2));
                     paddle2model.scale.set(0.35, 0.35, 0.35);
                     arena.rotateX(Math.PI / 2);
-                    arena.position.set(0, 0, 0);
+                    arena.position.set(0, -0.25, 0);
                     arena.scale.set(0.005, 0.005, 0.005);
                     // console.log(ballmodel);
                     // console.log(paddle1model);
@@ -244,8 +244,8 @@ function createScore(Scene)
     color: 0x56EEFB,
     metalness: 0.3,
     roughness: 0.4,
-    emissive: 0x00ff00,
-    emissiveIntensity: 0.1
+    // emissive: 0x56EEFB,
+    emissiveIntensity: 0
   });
 
   const scoreGeometry = new TextGeometry('0', textOptions);
@@ -263,8 +263,8 @@ function createScore(Scene)
   });
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(seconds) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }
 
 function restartGame(Terrain)
@@ -279,20 +279,19 @@ function restartGame(Terrain)
 
 }
 
-function updateScore(Scene, player, Terrain)
+const updateScore = (Scene, player, Terrain)=>
 {
     if (player === 1)
     p1Score++;
   else
     p2Score++;
-  // if (p1Score === 1 || p2Score === 1)
-  // {
-  //     restartGame(Terrain);
-  //     console.log("sleeping");
-  //     sleep(10000);
-  //     console.log("slept");
-  //     gamePaused = true;
-  // }
+  if (p1Score === 5 || p2Score === 5)
+  {
+      dispatchEvent(new CustomEvent('game-result', {detail : {winner : p1Score > p2Score ? "Player 1" : 'Player 2'}}))
+      gamePaused = true;
+      p1Score = 0;
+      p2Score = 0;
+  }
   if (p1ScoreMesh && p2ScoreMesh)
   {
     Scene.remove(p1ScoreMesh);
@@ -303,8 +302,8 @@ function updateScore(Scene, player, Terrain)
         color: 0x56EEFB,
         metalness: 0.3,
         roughness: 0.4,
-        emissive: 0x00ff00,
-        emissiveIntensity: 0.1
+        // emissive: 0x56EEFB,
+        emissiveIntensity: 0
       });
 
       const p1Geometry = new TextGeometry(p1Score.toString(), textOptions);
@@ -447,11 +446,16 @@ scene.add(light1);
 let gamePaused = false;
 
 
-function animate() {
+const animate = async() =>{
   if (!ingame) return;
-  if (gamePaused) return;
+  if (gamePaused)
+  {
+    await sleep(2)
+    document.querySelector('#winner').remove()
+    restartGame(Terrain);
+    gamePaused = false;
+  }
   requestAnimationFrame(animate);
-
   composer.render();
   // renderer.render(scene, camera);
 
@@ -469,4 +473,15 @@ function animate() {
   // console.log("Ball Z Position : ", Terrain.ballmesh.position.z);
 }
 
+
 animate();
+
+
+addEventListener("game-result", async (e) => {
+  const { winner } = e.detail
+  const view = document.createElement('div')
+  view.id = 'winner'
+  view.className = 'absolute w-full min-h-screen top-0 left-0 z-50 flex justify-center items-center text-white text-2xl bg-black/40'
+  view.textContent = winner
+  document.body.appendChild(view)
+})
