@@ -34,8 +34,11 @@ class BuildTerrain{
       this.wallmesh1 = new THREE.Mesh(this.wallgeo, this.wallmaterial);
 
 
-      this.wallmesh.position.set(0, 0, -4);
-      this.wallmesh1.position.set(0, 0, 4);
+      this.wallmesh.position.set(0, 0, -4.3);
+      this.wallmesh1.position.set(0, 0, 4.3);
+
+      this.wallmesh.visible = false;
+      this.wallmesh1.visible = false;
 
 
 
@@ -81,20 +84,6 @@ class BuildTerrain{
 
       this.ballmesh.position.set(0, 0.13, 0);
 
-      // Decorations
-
-      this.mlinegeo = new THREE.BoxGeometry(7.9, 0.05, 0.05);
-      this.mlinematerial = new THREE.MeshStandardMaterial({
-        color: 0x00cf2b,
-        emissive: 0x00cf2b,
-        emissiveIntensity: 0.8  ,
-        roughness: 0.5
-      });
-
-      this.mlinemesh = new THREE.Mesh(this.mlinegeo, this.mlinematerial);
-      this.mlinemesh.position.set(0, -0.2, 0);
-      this.mlinemesh.rotateY(Math.PI / 2);
-
         // Loaders
 
         this.loader = new GLTFLoader();
@@ -108,20 +97,25 @@ class BuildTerrain{
                     const ballmodel = model.getObjectByName('Ball');
                     const paddle1model = model.getObjectByName('Player');
                     const paddle2model = model.getObjectByName('PlayerTwo');
+                    const arena = model.getObjectByName('ArenaModel');
                     
                     paddle1model.position.copy(this.paddlemesh.position);
                     paddle1model.rotateY(Math.PI / 2);
-                    paddle1model.rotateX((Math.PI / 2)* 2);
-                    paddle1model.scale.set(0.3, 0.3, 0.3);
+                    // paddle1model.rotateX((Math.PI / 2));
+                    paddle1model.scale.set(0.35 , 0.35 , 0.35 );
                     paddle2model.position.copy(this.paddlemesh1.position);
                     paddle2model.rotateY(Math.PI / 2);
-                    paddle2model.rotateX((Math.PI / 2)* 2);
-                    paddle2model.scale.set(0.3, 0.3, 0.3);
+                    // paddle2model.rotateX((Math.PI / 2));
+                    paddle2model.scale.set(0.35, 0.35, 0.35);
+                    arena.rotateX(Math.PI / 2);
+                    arena.position.set(0, 0, 0);
+                    arena.scale.set(0.005, 0.005, 0.005);
                     // console.log(ballmodel);
                     // console.log(paddle1model);
                     // console.log(this.paddlemesh);
                     
                     ballmodel.scale.set(0.0033, 0.0033, 0.0033);
+                    ballmodel.position.copy(this.ballmesh.position);
 
                     
 
@@ -141,6 +135,7 @@ class BuildTerrain{
                     Scene.add(this.ballmesh);
                     Scene.add(this.paddlemesh);
                     Scene.add(this.paddlemesh1);
+                    Scene.add(arena);
 
                 },
                 function (xhr) {
@@ -161,14 +156,12 @@ class BuildTerrain{
       this.ballmesh.visible = false;
 
 
-      Scene.add(this.plane);
       Scene.add(this.wallmesh);
       Scene.add(this.wallmesh1);
       Scene.add(this.paddlemesh);
       Scene.add(this.paddlemesh1);
       
       Scene.add(this.ballmesh);
-      Scene.add(this.mlinemesh);
 
 
       // Setting the scene background
@@ -204,17 +197,17 @@ const speed = 0.09;
 function Playermovements(Terrain)
 {
 
-  if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1 > Terrain.wallmesh.position.z) {
+  if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1.25 > Terrain.wallmesh.position.z) {
     console.log("moving");
     Terrain.paddlemesh1.position.z -= speed;
   }
-  if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1 < Terrain.wallmesh1.position.z) {
+  if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1.25 < Terrain.wallmesh1.position.z) {
     Terrain.paddlemesh1.position.z += speed;
   }
-  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 1  > Terrain.wallmesh.position.z){
+  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 1.25  > Terrain.wallmesh.position.z){
     Terrain.paddlemesh.position.z -= speed; 
   }
-  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 1 < Terrain.wallmesh1.position.z) {
+  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 1.25 < Terrain.wallmesh1.position.z) {
     Terrain.paddlemesh.position.z += speed;
   }
 }
@@ -236,8 +229,8 @@ function createScore(Scene)
     // Create text geometry configuration
       textOptions = {
         font: font,
-        size: 1.5,
-        depth: 0.2,
+        size: 1,
+        depth: 0.1,
         curveSegments: 12,
         bevelEnabled: true,
         bevelThickness: 0.05,
@@ -248,11 +241,11 @@ function createScore(Scene)
 
 
   const textMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x00ff00,
+    color: 0x56EEFB,
     metalness: 0.3,
     roughness: 0.4,
-    // emissive: 0x00ff00,
-    // emissiveIntensity: 0.5
+    emissive: 0x00ff00,
+    emissiveIntensity: 0.1
   });
 
   const scoreGeometry = new TextGeometry('0', textOptions);
@@ -260,21 +253,46 @@ function createScore(Scene)
   p1ScoreMesh = new THREE.Mesh(scoreGeometry, textMaterial);
   p2ScoreMesh = new THREE.Mesh(scoreGeometry, textMaterial);
 
-  p1ScoreMesh.position.set(4, 1, -5);
-  p2ScoreMesh.position.set(-6, 1, -5);
+  p1ScoreMesh.position.set(-1.5, 1.55, -3.8);
+  p1ScoreMesh.rotateX(-1.1);
+  p2ScoreMesh.position.set(0.75, 1.55, -3.8);
+  p2ScoreMesh.rotateX(-1.1);
   Scene.add(p1ScoreMesh);
   Scene.add(p2ScoreMesh);
 
   });
 }
 
-function updateScore(Scene, player)
-{
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-  if (player === 1)
+function restartGame(Terrain)
+{
+  // Return the ball and the paddles to their starting positions
+  // Ball : 0, 0.13, 0
+  // P1 : -6.35, 0.13, 0
+  // P2 : 6.35, 0.13, 0
+  Terrain.ballmesh.position.set(0, 0.13, 0);
+  Terrain.paddlemesh.position.set(-6.35, 0.13, 0);
+  Terrain.paddlemesh1.position.set(6.35, 0.13, 0);
+
+}
+
+function updateScore(Scene, player, Terrain)
+{
+    if (player === 1)
     p1Score++;
   else
     p2Score++;
+  // if (p1Score === 1 || p2Score === 1)
+  // {
+  //     restartGame(Terrain);
+  //     console.log("sleeping");
+  //     sleep(10000);
+  //     console.log("slept");
+  //     gamePaused = true;
+  // }
   if (p1ScoreMesh && p2ScoreMesh)
   {
     Scene.remove(p1ScoreMesh);
@@ -282,11 +300,11 @@ function updateScore(Scene, player)
 
 
       const textMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x00ff00,
-        // metalness: 0.3,
-        // roughness: 0.4,
-        // emissive: 0x00ff00,
-        // emissiveIntensity: 0.5
+        color: 0x56EEFB,
+        metalness: 0.3,
+        roughness: 0.4,
+        emissive: 0x00ff00,
+        emissiveIntensity: 0.1
       });
 
       const p1Geometry = new TextGeometry(p1Score.toString(), textOptions);
@@ -295,8 +313,10 @@ function updateScore(Scene, player)
       p1ScoreMesh = new THREE.Mesh(p1Geometry, textMaterial);
       p2ScoreMesh = new THREE.Mesh(p2Geometry, textMaterial);
 
-      p1ScoreMesh.position.set(4, 1, -5);
-      p2ScoreMesh.position.set(-6, 1, -5);
+      p1ScoreMesh.position.set(-1.5, 1.55, -3.8);
+      p1ScoreMesh.rotateX(-1.1);
+      p2ScoreMesh.position.set(0.75, 1.55, -3.8);
+      p2ScoreMesh.rotateX(-1.1);
       Scene.add(p1ScoreMesh);
       Scene.add(p2ScoreMesh);
 
@@ -319,11 +339,11 @@ function updateBall(ball, paddles, Terrain, Scene) {
     }
 
     // Check for scoring
-    if (ball.position.x <= -6.65 || ball.position.x >= 6.65) {
+    if (ball.position.x <= -7.5 || ball.position.x >= 7.5) {
       if (ball.position.x < 0)
-        updateScore(Scene, 1);
+        updateScore(Scene, 2, Terrain);
       else
-      updateScore(Scene, 2);
+      updateScore(Scene, 1, Terrain);
       // Reset ball position
       ball.position.set(0, 0.13, 0);
       ballVelocity = new THREE.Vector3(ballSpeed * (Math.random() > 0.5 ? 1 : -1), 0, ballSpeed * (Math.random() > 0.5 ? 1 : -1));
@@ -392,7 +412,7 @@ const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerH
 const controls = new OrbitControls(camera, renderer.domElement);
 
 // camera.position.set(-4.55, 7.75, 10.21);
-camera.position.set(0, 10, 10);
+camera.position.set(0, 8.5, 6);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
 
@@ -424,19 +444,24 @@ composer.addPass(BloomPass);
 
 scene.add(light);
 scene.add(light1);
-
+let gamePaused = false;
 
 
 function animate() {
   if (!ingame) return;
+  if (gamePaused) return;
   requestAnimationFrame(animate);
 
   composer.render();
   // renderer.render(scene, camera);
 
+
+
   // Paddle Movements
 
   Playermovements(Terrain);
+
+  //  Other
 
   // Ball Movements
 
