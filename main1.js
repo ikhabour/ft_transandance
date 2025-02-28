@@ -6,22 +6,6 @@ class BuildTerrain{
     constructor(Scene)
     {
 
-
-      // Plane
-
-      this.planegeo = new THREE.PlaneGeometry(20, 15, 32, 32);
-      this.planematerial = new THREE.MeshStandardMaterial({
-        color: 0x5b5b5b,
-        roughness: 3,
-        metalness: 0.3,
-        side: THREE.DoubleSide  
-      });
-      this.plane = new THREE.Mesh(this.planegeo, this.planematerial);
-      this.plane.rotateX(-(Math.PI / 2));
-      this.plane.position.set(0, -0.2, 0);
-      this.plane.receiveShadow = true;
-      // this.plane.castShadow = true;
-
       // Walls
 
       this.wallgeo = new THREE.BoxGeometry(14, 0.4, 0.4, 32, 32, 32);
@@ -40,11 +24,9 @@ class BuildTerrain{
       this.wallmesh.visible = false;
       this.wallmesh1.visible = false;
 
-
-
       // Paddles
 
-      this.paddlegeo = new THREE.CapsuleGeometry(0.12, 1.25, 32, 32);
+      this.paddlegeo = new THREE.CapsuleGeometry(0.13, 1.45, 32, 32);
       this.paddlematerial = new THREE.MeshStandardMaterial({
         color: 0x00cf2b,
         emissive: 0x00cf2b,
@@ -79,7 +61,6 @@ class BuildTerrain{
         metalness: 0.1
       });
 
-      // this.ball_light = new THREE.PointLight(0x229EED, 1, 5);
       this.ballmesh = new THREE.Mesh(this.ballgeo, this.ballmaterial);
 
       this.ballmesh.position.set(0, 0, 0);
@@ -92,6 +73,7 @@ class BuildTerrain{
                 'models/Game Play.gltf',
                  (gltf) => {
                     // Model loaded successfully
+
                     const model = gltf.scene;
                     
                     const ballmodel = model.getObjectByName('Ball');
@@ -99,38 +81,39 @@ class BuildTerrain{
                     const paddle2model = model.getObjectByName('PlayerTwo');
                     const arena = model.getObjectByName('ArenaModel');
                     
+                    // Paddles Models
+
                     paddle1model.position.copy(this.paddlemesh.position);
                     paddle1model.rotateY(Math.PI / 2);
-                    // paddle1model.rotateX((Math.PI / 2));
                     paddle1model.scale.set(0.35 , 0.35 , 0.35 );
+
                     paddle2model.position.copy(this.paddlemesh1.position);
                     paddle2model.rotateY(Math.PI / 2);
-                    // paddle2model.rotateX((Math.PI / 2));
                     paddle2model.scale.set(0.35, 0.35, 0.35);
+
+                    // Arena model
+
                     arena.rotateX(Math.PI / 2);
                     arena.position.set(0, -0.25, 0);
                     arena.scale.set(0.005, 0.005, 0.005);
-                    // console.log(ballmodel);
-                    // console.log(paddle1model);
-                    // console.log(this.paddlemesh);
-                    
-                    ballmodel.scale.set(0.0033, 0.0033, 0.0033);
+
+                    // Ball Model
+              
                     ballmodel.position.copy(this.ballmesh.position);
+                    ballmodel.scale.set(0.0033, 0.0033, 0.0033);
 
-                    
+                    // Replace the existing meshes
 
-                    // Replace the existing ball mesh
                     this.paddlemesh.parent.remove(this.paddlemesh);
                     this.paddlemesh = paddle1model;
 
                     this.paddlemesh1.parent.remove(this.paddlemesh1);
                     this.paddlemesh1 = paddle2model;
 
-                    
-
-
                     this.ballmesh.parent.remove(this.ballmesh);
                     this.ballmesh = ballmodel;
+
+                    // Adding the new Meshes to the scene
 
                     Scene.add(this.ballmesh);
                     Scene.add(this.paddlemesh);
@@ -160,7 +143,6 @@ class BuildTerrain{
       Scene.add(this.wallmesh1);
       Scene.add(this.paddlemesh);
       Scene.add(this.paddlemesh1);
-      
       Scene.add(this.ballmesh);
 
 
@@ -182,35 +164,7 @@ class BuildTerrain{
     }
 }
 
-const keyState = {};
 
-window.addEventListener('keydown', (event) => {
-  keyState[event.code] = true;
-});
-
-window.addEventListener('keyup', (event) => {
-  keyState[event.code] = false;
-});
-
-const speed = 0.09;
-
-function Playermovements(Terrain)
-{
-
-  if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1.25 > Terrain.wallmesh.position.z) {
-    console.log("moving");
-    Terrain.paddlemesh1.position.z -= speed;
-  }
-  if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1.25 < Terrain.wallmesh1.position.z) {
-    Terrain.paddlemesh1.position.z += speed;
-  }
-  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 1.25  > Terrain.wallmesh.position.z){
-    Terrain.paddlemesh.position.z -= speed; 
-  }
-  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 1.25 < Terrain.wallmesh1.position.z) {
-    Terrain.paddlemesh.position.z += speed;
-  }
-}
 
 let p1Score = 0;
 let p2Score = 0;
@@ -270,12 +224,12 @@ function sleep(seconds) {
 function restartGame(Terrain)
 {
   // Return the ball and the paddles to their starting positions
-  // Ball : 0, 0.13, 0
-  // P1 : -6.35, 0.13, 0
-  // P2 : 6.35, 0.13, 0
-  Terrain.ballmesh.position.set(0, 0.13, 0);
-  Terrain.paddlemesh.position.set(-6.35, 0.13, 0);
-  Terrain.paddlemesh1.position.set(6.35, 0.13, 0);
+  // Ball : 0, 0, 0
+  // P1 : -6.35, 0, 0
+  // P2 : 6.35, 0, 0
+  Terrain.ballmesh.position.set(0, 0, 0);
+  Terrain.paddlemesh.position.set(-6.35, 0, 0);
+  Terrain.paddlemesh1.position.set(6.35, 0, 0);
 
 }
 
@@ -323,7 +277,6 @@ const updateScore = (Scene, player, Terrain)=>
 }
 
 
-let ingame = true;
 const ballSpeed = 0.07;
 let ballVelocity = new THREE.Vector3(ballSpeed, 0, ballSpeed);
 
@@ -351,13 +304,13 @@ function updateBall(ball, paddles, Terrain, Scene) {
     // Paddle collision detection
     paddles.forEach(paddle => {
         // Calculate the bounds of the paddle
-        const paddleLeft = paddle.position.x - 0.125; // Half of paddle depth
-        const paddleRight = paddle.position.x + 0.125;
-        const paddleTop = paddle.position.z - 0.75; // Half of paddle height
-        const paddleBottom = paddle.position.z + 0.75;
+        const paddleLeft = paddle.position.x - 0.150; // Half of paddle depth
+        const paddleRight = paddle.position.x + 0.150;
+        const paddleTop = paddle.position.z - 0.95; // Half of paddle height
+        const paddleBottom = paddle.position.z + 0.95;
 
-        ball.rotation.x += ballVelocity.x;
-        ball.rotation.y += ballVelocity.z;
+        // ball.rotation.x += ballVelocity.x;
+        ball.rotation.y += ballVelocity.x;
 
         // Check if ball is within paddle bounds
         if (ball.position.x >= paddleLeft && 
@@ -404,6 +357,8 @@ const renderer = new THREE.WebGLRenderer({
     powerPreference: "high-performance", // Optimizes rendering performance
   });
 document.body.appendChild( renderer.domElement );
+renderer.domElement.setAttribute('tabindex', '0');
+renderer.domElement.focus();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio); // Matches screen resolution
 renderer.shadowMap.enabled = true;
@@ -425,6 +380,67 @@ light.position.set(0, 5, 0);
 light.castShadow = true;
 
 
+const keyState = {};
+
+
+
+let useComposer = false;
+
+renderer.domElement.addEventListener('keydown', (event) => {
+  if (event.code === 'Numpad0')
+      singlePlayerMode();
+  if (event.code === 'ShiftRight')
+      useComposer = !useComposer;
+  if (event.code === 'Enter')
+  {
+      gamestart = !gamestart;
+      dispatchEvent(new CustomEvent('game-pause'))
+      return ;
+  }
+  keyState[event.code] = true;
+});
+
+renderer.domElement.addEventListener('keyup', (event) => {
+  keyState[event.code] = false;
+});
+
+const speed = 0.09;
+
+function Playermovements(Terrain, event)
+{
+  if (!singlePlayer)
+  {
+    if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1.25 > Terrain.wallmesh.position.z) {
+      Terrain.paddlemesh1.position.z -= speed;
+    }
+    if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1.25 < Terrain.wallmesh1.position.z) {
+      Terrain.paddlemesh1.position.z += speed;
+    }
+  }
+  // else
+  // {
+  //   if ((Terrain.ballmesh.position.z > 0 && Terrain.paddlemesh1.position.z <= Terrain.ballmesh.position.z) && Terrain.paddlemesh1.position.z + 1.25 < Terrain.wallmesh1.position.z)
+  //   {
+  //       Terrain.paddlemesh1.position.z += speed;
+  //   }
+  //   else if ((Terrain.ballmesh.position.z < 0 && Terrain.paddlemesh1.position.z >= Terrain.ballmesh.position.z) && Terrain.paddlemesh1.position.z - 1.25 > Terrain.wallmesh.position.z)
+  //     Terrain.paddlemesh1.position.z -= speed;
+  // }
+  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 1.25  > Terrain.wallmesh.position.z){
+    Terrain.paddlemesh.position.z -= speed; 
+  }
+  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 1.25 < Terrain.wallmesh1.position.z) {
+    Terrain.paddlemesh.position.z += speed;
+  }
+}
+
+
+function singlePlayerMode()
+{
+  singlePlayer = !singlePlayer;
+}
+
+
 
 const Terrain = new BuildTerrain(scene);
 createScore(scene);
@@ -443,11 +459,13 @@ composer.addPass(BloomPass);
 
 scene.add(light);
 scene.add(light1);
+let gamestart = true;
 let gamePaused = false;
+let singlePlayer = false;
 
 
 const animate = async() =>{
-  if (!ingame) return;
+
   if (gamePaused)
   {
     await sleep(2)
@@ -456,25 +474,21 @@ const animate = async() =>{
     gamePaused = false;
   }
   requestAnimationFrame(animate);
-  composer.render();
-  // renderer.render(scene, camera);
+  if (useComposer)
+    composer.render();
+  else
+    renderer.render(scene, camera);
 
-
-
-  // Paddle Movements
-
-  Playermovements(Terrain);
-
-  //  Other
-
-  // Ball Movements
-
-  updateBall(Terrain.ballmesh, [Terrain.paddlemesh1, Terrain.paddlemesh], Terrain, scene);
-  // console.log("Ball Z Position : ", Terrain.ballmesh.position.z);
+  if (gamestart)
+  {
+    Playermovements(Terrain);
+    updateBall(Terrain.ballmesh, [Terrain.paddlemesh1, Terrain.paddlemesh], Terrain, scene);
+  }
 }
 
 
 animate();
+
 
 
 addEventListener("game-result", async (e) => {
@@ -483,5 +497,19 @@ addEventListener("game-result", async (e) => {
   view.id = 'winner'
   view.className = 'absolute w-full min-h-screen top-0 left-0 z-50 flex justify-center items-center text-white text-2xl bg-black/40'
   view.textContent = winner
+  document.body.appendChild(view)
+})
+
+
+addEventListener("game-pause", async () => {
+  if (gamestart)
+  {
+    document.getElementById("pause").remove()
+    return
+  }
+  const view = document.createElement('div')
+  view.id = 'pause'
+  view.className = 'absolute w-full min-h-screen top-0 left-0 z-50 flex justify-center items-center text-white text-2xl bg-black/40'
+  view.textContent = 'Paused'
   document.body.appendChild(view)
 })
