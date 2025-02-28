@@ -408,29 +408,40 @@ const speed = 0.09;
 
 function Playermovements(Terrain, event)
 {
+
+
+  const paddle1 = Terrain.paddlemesh;
+  const paddle2 = Terrain.paddlemesh1;
+  const ball = Terrain.ballmesh;
+  const wall = Terrain.wallmesh;
+  const wall1 = Terrain.wallmesh1;
+
+  
   if (!singlePlayer)
   {
-    if (keyState['ArrowUp'] && Terrain.paddlemesh1.position.z - 1.25 > Terrain.wallmesh.position.z) {
-      Terrain.paddlemesh1.position.z -= speed;
+    if (keyState['ArrowUp'] && paddle2.position.z - 1.25 > wall.position.z) {
+      paddle2.position.z -= speed;
     }
-    if (keyState['ArrowDown'] && Terrain.paddlemesh1.position.z + 1.25 < Terrain.wallmesh1.position.z) {
-      Terrain.paddlemesh1.position.z += speed;
+    if (keyState['ArrowDown'] && paddle2.position.z + 1.25 < wall1.position.z) {
+      paddle2.position.z += speed;
     }
   }
-  // else
-  // {
-  //   if ((Terrain.ballmesh.position.z > 0 && Terrain.paddlemesh1.position.z <= Terrain.ballmesh.position.z) && Terrain.paddlemesh1.position.z + 1.25 < Terrain.wallmesh1.position.z)
-  //   {
-  //       Terrain.paddlemesh1.position.z += speed;
-  //   }
-  //   else if ((Terrain.ballmesh.position.z < 0 && Terrain.paddlemesh1.position.z >= Terrain.ballmesh.position.z) && Terrain.paddlemesh1.position.z - 1.25 > Terrain.wallmesh.position.z)
-  //     Terrain.paddlemesh1.position.z -= speed;
-  // }
-  if (keyState['KeyW'] && Terrain.paddlemesh.position.z - 1.25  > Terrain.wallmesh.position.z){
-    Terrain.paddlemesh.position.z -= speed; 
+  else
+  {
+    if ((ball.position.z > 0 && paddle2.position.z <= ball.position.z) && paddle2.position.z + 1.25 < wall1.position.z)
+    {
+        paddle2.position.z += speed;
+    }
+    else if ((ball.position.z < 0 && paddle2.position.z >= ball.position.z) && paddle2.position.z - 1.25 > wall.position.z)
+    {
+      paddle2.position.z -= speed;
+    }
   }
-  if (keyState['KeyS'] && Terrain.paddlemesh.position.z + 1.25 < Terrain.wallmesh1.position.z) {
-    Terrain.paddlemesh.position.z += speed;
+  if (keyState['KeyW'] && paddle1.position.z - 1.25  > wall.position.z){
+    paddle1.position.z -= speed; 
+  }
+  if (keyState['KeyS'] && paddle1.position.z + 1.25 < wall1.position.z) {
+    paddle1.position.z += speed;
   }
 }
 
@@ -439,8 +450,6 @@ function singlePlayerMode()
 {
   singlePlayer = !singlePlayer;
 }
-
-
 
 const Terrain = new BuildTerrain(scene);
 createScore(scene);
